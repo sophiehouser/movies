@@ -4,7 +4,7 @@ from storage_csv import StorageCSV
 from movie_service import MovieService
 
 if __name__ == '__main__':
-    storage = StorageJson('data2.json')
+    storage = StorageJson('data.json')
     # storage = StorageCSV('data.csv')
     service = MovieService(storage)
     movie_app = MovieApp(service)

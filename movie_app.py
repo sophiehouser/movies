@@ -37,16 +37,16 @@ class MovieApp:
         """
         Prints all movies
         """
-        print(f"{len(self._movies_service.movies)} movies in total")
+        print(f"{len(self._movies_service.get_movies())} movies in total")
 
-        for movie in self._movies_service.movies.values():
+        for movie in self._movies_service.get_movies().values():
             print(f"{movie.title} ({movie.year_of_release}): {movie.rating}")
 
     def _command_movie_stats(self):
         """
         Give stats about movies in db
         """
-        if len(self._movies_service.movies) == 0:
+        if len(self._movies_service.get_movies()) == 0:
             print("No movies to give stats on")
             return
 
@@ -65,7 +65,7 @@ class MovieApp:
 
     def _command_add_movie(self):
         """
-        Adds a movie to the DB
+        Gets movies from api and adds to the DB
         """
         while True:
             title = input("Enter new movie name: ")
@@ -113,6 +113,7 @@ class MovieApp:
             print("No movies available to sort.")
 
     def _command_generate_website(self):
+        """Generates webpage using template and movies"""
         with open('website_frontend/index_template.html', 'r') as file:
             template = file.read()
 
@@ -130,7 +131,6 @@ class MovieApp:
         Decides which actions to take based on the user's input
         :param user_input: String
         """
-
         user_input_list = user_input.split()
 
         if len(user_input_list) == 0:
@@ -154,6 +154,7 @@ class MovieApp:
         print("Enter choice (0-10):")
 
     def run(self):
+        """Prints all the menu options and manages the user input"""
         print("********** My Movies Database **********")
 
         while True:

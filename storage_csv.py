@@ -6,10 +6,11 @@ import os.path
 
 class StorageCSV(IStorage):
     def __init__(self, file_path):
-        self.file_path = file_path
+        self._file_path = file_path
 
     def save(self, movies: dict[str, Movie]):
-        with open(self.file_path, 'w', newline='') as file:
+        """Saves all movies to file_path"""
+        with open(self._file_path, 'w', newline='') as file:
             fieldnames = ['title', 'rating', 'year', 'poster']
             writer = csv.DictWriter(file, fieldnames=fieldnames)
 
@@ -23,9 +24,12 @@ class StorageCSV(IStorage):
                 })
 
     def get_movies(self) -> dict[str, Movie]:
+        """
+        Loads all the movies from file_path
+        """
         movies = {}
-        if os.path.exists(self.file_path):
-            with open(self.file_path, 'r', newline='') as file:
+        if os.path.exists(self._file_path):
+            with open(self._file_path, 'r', newline='') as file:
                 csv_reader = csv.DictReader(file)
                 for row in csv_reader:
                     title = row['title']

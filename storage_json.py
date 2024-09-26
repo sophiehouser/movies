@@ -5,7 +5,7 @@ from movie import Movie
 
 class StorageJson(IStorage):
     def __init__(self, file_path):
-        self.file_path = file_path
+        self._file_path = file_path
 
     def save(self, movies: dict[str, Movie]):
         """
@@ -21,7 +21,7 @@ class StorageJson(IStorage):
             }
 
         # Write the dictionary to a JSON file
-        with open(self.file_path, 'w') as file:
+        with open(self._file_path, 'w') as file:
             json.dump(movies_dict, file, indent=4)
 
     def get_movies(self) -> dict[str, Movie]:
@@ -30,7 +30,7 @@ class StorageJson(IStorage):
         """
         try:
             # Attempt to open and read the JSON file
-            with open(self.file_path, 'r') as file:
+            with open(self._file_path, 'r') as file:
                 movies_dict = json.load(file)
 
             movies = {}

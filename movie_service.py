@@ -8,26 +8,24 @@ import os
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
 
+
 class MovieService:
     def __init__(self, storage: IStorage):
         self._storage = storage
-        self.movies = self._storage.get_movies()
+        self._movies = self._storage.get_movies()
+
+    def get_movies(self) -> dict[str, Movie]:
+        """ Returns all the movies from the storage"""
+        return self._storage.get_movies()
 
     def save_movies(self):
-        self._storage.save(self.movies)
-
-    def has_movie(self, title: str):
-        """
-        Checks if movie is in DB
-        :param title: String
-        :return: Bool
-        """
-        if title in self.movies:
-            return True
-        else:
-            return False
+        """ Saves all movies to storage """
+        self._storage.save(self._movies)
 
     def add_movie(self, title: str):
+        """
+        Gets movies from api and adds to the DB
+        """
         url = f"https://www.omdbapi.com/?apikey={API_KEY}&t={title}"
 
         response = requests.get(url)
@@ -40,7 +38,7 @@ class MovieService:
                     rating=movie_data["imdbRating"],
                     poster=movie_data["Poster"]
                 )
-                self.movies[new_movie.title] = new_movie
+                self._movies[new_movie.title] = new_movie
                 return True
             else:
                 print(f"Movie '{title}' not found.")
@@ -49,14 +47,13 @@ class MovieService:
             print("Failed to fetch movie data from the API.")
             return False
 
-
     def delete_movie(self, title: str):
         """
         Deletes a movie based on user input
         :param title: String
         """
-        if title in self.movies:
-            del self.movies[title]
+        if title in self._movies:
+            del self._movies[title]
             print(f"Movie {title} successfully deleted")
         else:
             print(f"Movie {title} doesn't exist!")
@@ -66,7 +63,7 @@ class MovieService:
         Updates movie based on user input
         :param title: String
         """
-        if title in self.movies:
+        if title in self._movies:
             while True:
                 year = input("Enter new movie year: ")
                 try:
@@ -93,9 +90,9 @@ class MovieService:
         """
         Prints all movies
         """
-        print(f"{len(self.movies)} movies in total")
+        print(f"{len(self._movies)} movies in total")
 
-        for movie in self.movies.values():
+        for movie in self._movies.values():
             print(f"{movie.title} ({movie.year_of_release}): {movie.rating}")
 
     def get_highest_rated_movies(self):
@@ -103,12 +100,12 @@ class MovieService:
         Gets the highest rated movies
         :return: []Movies
         """
-        if not self.movies:
+        if not self._movies:
             return []
-        highest_rating = max(movie.rating for movie in self.movies.values())
+        highest_rating = max(movie.rating for movie in self._movies.values())
 
         highest_rated_movies = []
-        for movie in self.movies.values():
+        for movie in self._movies.values():
             if movie.rating == highest_rating:
                 highest_rated_movies.append(movie)
 
@@ -119,12 +116,12 @@ class MovieService:
         Gets the lowest rated movies
         :return: []Movies
         """
-        if not self.movies:
+        if not self._movies:
             return []
-        lowest_rating = min(movie.rating for movie in self.movies.values())
+        lowest_rating = min(movie.rating for movie in self._movies.values())
 
         lowest_rated_movies = []
-        for movie in self.movies.values():
+        for movie in self._movies.values():
             if movie.rating == lowest_rating:
                 lowest_rated_movies.append(movie)
 
@@ -135,10 +132,10 @@ class MovieService:
         Finds the median rated movie
         :return: Movie
         """
-        if not self.movies:
+        if not self._movies:
             return None
 
-        sorted_movies = sorted(self.movies.values(), key=lambda movie: movie.rating)
+        sorted_movies = sorted(self._movies.values(), key=lambda movie: movie.rating)
         num_movies = len(sorted_movies)
 
         if num_movies % 2 == 1:  # Odd number of movies
@@ -153,20 +150,20 @@ class MovieService:
         Calculates the average rating of all the movies
         :return: Float
         """
-        if not self.movies:
+        if not self._movies:
             return 0.0
-        total_rating = sum(movie.rating for movie in self.movies.values())
-        return total_rating / len(self.movies)
+        total_rating = sum(movie.rating for movie in self._movies.values())
+        return total_rating / len(self._movies)
 
     def get_random_movie(self):
         """
         Gets a random movie
         :return: Movie
         """
-        if not self.movies:
+        if not self._movies:
             return None
 
-        return random.choice(list(self.movies.values()))
+        return random.choice(list(self._movies.values()))
 
     def search_movies(self, query: str):
         """
@@ -175,7 +172,7 @@ class MovieService:
         :return: []Movie
         """
         matching_movies = []
-        for movie in self.movies.values():
+        for movie in self._movies.values():
             if query.lower() in movie.title.lower():
                 matching_movies.append(movie)
 
@@ -186,11 +183,14 @@ class MovieService:
         Creates array of sorted movies by rating
         :return: []Movie
         """
-        return sorted(self.movies.values(), key=lambda movie: movie.rating, reverse=True)
+        return sorted(self._movies.values(), key=lambda movie: movie.rating, reverse=True)
 
     def generate_html_movies(self):
+        """
+        Gets movies as a string of html li items
+        """
         html_movies = ""
-        for movie in self.movies.values():
+        for movie in self._movies.values():
             html_movies += f"""
             <li>
                 <div class="movie">
@@ -201,4 +201,3 @@ class MovieService:
             </li>
             """
         return html_movies
-
