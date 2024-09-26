@@ -36,8 +36,8 @@ class MovieService:
             if movie_data.get("Response") == "True":
                 new_movie = Movie(
                     title=movie_data["Title"],
-                    year_of_release=int(movie_data["Year"]),
-                    rating=float(movie_data["imdbRating"]),
+                    year_of_release=movie_data["Year"],
+                    rating=movie_data["imdbRating"],
                     poster=movie_data["Poster"]
                 )
                 self.movies[new_movie.title] = new_movie
@@ -187,3 +187,18 @@ class MovieService:
         :return: []Movie
         """
         return sorted(self.movies.values(), key=lambda movie: movie.rating, reverse=True)
+
+    def generate_html_movies(self):
+        html_movies = ""
+        for movie in self.movies.values():
+            html_movies += f"""
+            <li>
+                <div class="movie">
+                    <img class="movie-poster" src="{movie.poster}" title="">
+                    <div class="movie-title">{movie.title}</div>
+                    <div class="movie-year">{movie.year_of_release}</div>
+                </div>
+            </li>
+            """
+        return html_movies
+

@@ -10,7 +10,7 @@ class StorageCSV(IStorage):
 
     def save(self, movies: dict[str, Movie]):
         with open(self.file_path, 'w', newline='') as file:
-            fieldnames = ['title', 'rating', 'year']
+            fieldnames = ['title', 'rating', 'year', 'poster']
             writer = csv.DictWriter(file, fieldnames=fieldnames)
 
             writer.writeheader()
@@ -18,7 +18,8 @@ class StorageCSV(IStorage):
                 writer.writerow({
                     'title': movie.title,
                     'rating': movie.rating,
-                    'year': movie.year_of_release
+                    'year': movie.year_of_release,
+                    'poster': movie.poster
                 })
 
     def get_movies(self) -> dict[str, Movie]:
@@ -30,9 +31,9 @@ class StorageCSV(IStorage):
                     title = row['title']
                     movie = Movie(
                         title=title,
-                        year_of_release=int(row['year']),
-                        rating=float(row['rating']),
-                        poster=""
+                        year_of_release=row['year'],
+                        rating=row['rating'],
+                        poster=row['poster']
                     )
                     movies[title] = movie
         return movies

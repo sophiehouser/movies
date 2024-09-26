@@ -15,6 +15,7 @@ class MovieApp:
             "6": ("Random movie", self._command_random_movie),
             "7": ("Search movie", self._command_search_movie),
             "8": ("Movies sorted by rating", self._command_sorted_by_rating),
+            "9": ("Generate web pagee", self._command_generate_website),
         }
 
     def _command_delete_movie(self):
@@ -111,8 +112,18 @@ class MovieApp:
         else:
             print("No movies available to sort.")
 
-    def _generate_website(self):
-        ...
+    def _command_generate_website(self):
+        with open('website_frontend/index_template.html', 'r') as file:
+            template = file.read()
+
+        movie_grid = self._movies_service.generate_html_movies()
+
+        filled_template = template.replace('__TEMPLATE_MOVIE_GRID__', movie_grid)
+
+        with open('website_frontend/index.html', 'w') as file:
+            file.write(filled_template)
+
+        print("Website generated successfully.")
 
     def _manage_user_input(self, user_input):
         """
