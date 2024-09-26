@@ -1,6 +1,6 @@
-from istorage import IStorage
+from .istorage import IStorage
 import json
-from movie import Movie
+from domain.movie import Movie
 
 
 class StorageJson(IStorage):

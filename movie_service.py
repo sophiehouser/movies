@@ -1,4 +1,4 @@
-from movie import Movie
+from domain.movie import Movie
 from storage.istorage import IStorage
 import random
 import requests

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from movie import Movie
+from domain.movie import Movie
 
 
 class IStorage(ABC):

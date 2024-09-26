@@ -1,5 +1,5 @@
-from istorage import IStorage
-from movie import Movie
+from .istorage import IStorage
+from domain.movie import Movie
 import csv
 import os.path
 
