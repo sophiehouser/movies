@@ -1,6 +1,7 @@
 from istorage import IStorage
 from movie import Movie
 import csv
+import os.path
 
 
 class StorageCSV(IStorage):
@@ -22,15 +23,16 @@ class StorageCSV(IStorage):
 
     def get_movies(self) -> dict[str, Movie]:
         movies = {}
-        with open(self.file_path, 'r', newline='') as file:
-            csv_reader = csv.DictReader(file)
-            for row in csv_reader:
-                title = row['title']
-                movie = Movie(
-                    title=title,
-                    year_of_release=int(row['year']),
-                    rating=float(row['rating']),
-                    poster=""
-                )
-                movies[title] = movie
+        if os.path.exists(self.file_path):
+            with open(self.file_path, 'r', newline='') as file:
+                csv_reader = csv.DictReader(file)
+                for row in csv_reader:
+                    title = row['title']
+                    movie = Movie(
+                        title=title,
+                        year_of_release=int(row['year']),
+                        rating=float(row['rating']),
+                        poster=""
+                    )
+                    movies[title] = movie
         return movies
