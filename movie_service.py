@@ -1,61 +1,15 @@
+from movie import Movie
+from istorage import IStorage
 import random
-import json
-
-JSON_FILENAME = "data.json"
 
 
-class Movie:
-    def __init__(self, title: str, year_of_release: int, rating: float, poster: str) -> None:
-        self.title = title
-        self.year_of_release = year_of_release
-        self.rating = rating
-        self.poster = poster
+class MovieService:
+    def __init__(self, storage: IStorage):
+        self._storage = storage
+        self.movies = self._storage.get_movies()
 
-
-class MovieDatabase:
-    def __init__(self):
-        self.movies = {}
-        self.load_from_file(JSON_FILENAME)
-
-    def save(self):
-        """
-        Saves all movies to JSON_FILENAME
-        """
-        movies_dict = {}
-        for title, movie in self.movies.items():
-            movies_dict[title] = {
-                "title": movie.title,
-                "year_of_release": movie.year_of_release,
-                "rating": movie.rating,
-                "poster": movie.poster
-            }
-
-        # Write the dictionary to a JSON file
-        with open(JSON_FILENAME, 'w') as file:
-            json.dump(movies_dict, file, indent=4)
-
-    def load_from_file(self, filename):
-        """
-        Loads all the movies from JSON_FILENAME
-        :param filename: String
-        """
-        try:
-            # Attempt to open and read the JSON file
-            with open(filename, 'r') as file:
-                movies_dict = json.load(file)
-
-            # Convert the dictionaries back into Movie objects
-            for title, movie_data in movies_dict.items():
-                movie = Movie(
-                    title=movie_data['title'],
-                    year_of_release=movie_data['year_of_release'],
-                    rating=movie_data['rating'],
-                    poster=movie_data['poster']
-                )
-                self.movies[title] = movie
-
-        except FileNotFoundError:
-            self.movies = {}
+    def save_movies(self):
+        self._storage.save(self.movies)
 
     def has_movie(self, title: str):
         """

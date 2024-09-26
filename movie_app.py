@@ -1,18 +1,15 @@
-from istorage import IStorage
+from movie_service import MovieService
 import sys
 
 
 class MovieApp:
-    def __init__(self, storage: IStorage):
-        self._storage = storage
-        self._movies = self._storage.get_movies()
+    def __init__(self, service: MovieService):
+        self._movies_service = service
 
         self._menu_options_map = {
             "0": ("Exit", self._command_exit_option),
             "1": ("List movies", self._command_list_movies),
-            # "2": ("Add movie", self._),
             # "3": ("Delete movie", delete_movie_option),
-            # "4": ("Update movie", update_movie_option),
             "2": ("Stats", self._command_movie_stats),
             # "6": ("Random movie", random_movie_option),
             # "7": ("Search movie", search_movie_option),
@@ -22,87 +19,32 @@ class MovieApp:
     def _command_exit_option(self):
         """
         Saves movies and exits the program
-        :param db: MovieDatabase
         """
-        self._storage.save()
+        self._movies_service.save_movies()
         print("Exiting after saving movies")
         sys.exit()
 
     def _command_list_movies(self):
-        self._storage.list_movies()
-
-    def get_highest_rated_movies(self):
         """
-        Gets the highest rated movies
-        :return: []Movies
+        Prints all movies
         """
-        if not self._movies:
-            return []
-        highest_rating = max(movie.rating for movie in self._movies.values())
+        print(f"{len(self._movies_service.movies)} movies in total")
 
-        highest_rated_movies = []
-        for movie in self._movies.values():
-            if movie.rating == highest_rating:
-                highest_rated_movies.append(movie)
-
-        return highest_rated_movies
-
-    def get_lowest_rated_movies(self):
-        """
-        Gets the lowest rated movies
-        :return: []Movies
-        """
-        if not self._movies:
-            return []
-        lowest_rating = min(movie.rating for movie in self._movies.values())
-
-        lowest_rated_movies = []
-        for movie in self._movies.values():
-            if movie.rating == lowest_rating:
-                lowest_rated_movies.append(movie)
-
-        return lowest_rated_movies
-
-    def find_median_rated_movie(self):
-        """
-        Finds the median rated movie
-        :return: Movie
-        """
-        if not self._movies:
-            return None
-
-        sorted_movies = sorted(self._movies.values(), key=lambda movie: movie.rating)
-        num_movies = len(sorted_movies)
-
-        if num_movies % 2 == 1:  # Odd number of movies
-            median_index = num_movies // 2
-        else:  # Even number of movies
-            median_index = (num_movies // 2) - 1
-
-        return sorted_movies[median_index]
-
-    def calculate_average_rating(self):
-        """
-        Calculates the average rating of all the movies
-        :return: Float
-        """
-        if not self._movies:
-            return 0.0
-        total_rating = sum(movie.rating for movie in self._movies.values())
-        return total_rating / len(self._movies)
+        for movie in self._movies_service.movies.values():
+            print(f"{movie.title} ({movie.year_of_release}): {movie.rating}")
 
     def _command_movie_stats(self):
         """
         Give stats about movies in db
         """
-        if len(self._movies.values()) == 0:
+        if len(self._movies_service.movies) == 0:
             print("No movies to give stats on")
             return
 
-        average = self.calculate_average_rating()
-        median = self.find_median_rated_movie()
-        best = self.get_highest_rated_movies()
-        worst = self.get_lowest_rated_movies()
+        average = self._movies_service.calculate_average_rating()
+        median = self._movies_service.find_median_rated_movie()
+        best = self._movies_service.get_highest_rated_movies()
+        worst = self._movies_service.get_lowest_rated_movies()
 
         print(f"Average rating: {average}")
         if median:
@@ -112,7 +54,6 @@ class MovieApp:
         for movie in worst:
             print(f"Worst movie: {movie.title}, {movie.rating}")
 
-        ...
 
     def _generate_website(self):
         ...
@@ -120,7 +61,6 @@ class MovieApp:
     def _manage_user_input(self, user_input):
         """
         Decides which actions to take based on the user's input
-        :param db: instance of MovieDatabase
         :param user_input: String
         """
 
@@ -158,4 +98,5 @@ class MovieApp:
 
                 input("Press enter to continue ")
             finally:
-                self._storage.save()
+                pass
+            #     self._movies_service.save_movies()
