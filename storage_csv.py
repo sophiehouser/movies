@@ -1,12 +1,36 @@
+from istorage import IStorage
+from movie import Movie
+import csv
 
-class StorageCSV(IStorage):  # pylint: disable=too-few-public-methods
+
+class StorageCSV(IStorage):
     def __init__(self, file_path):
         self.file_path = file_path
-        self.movies = {}
-        self.get_movies_from_file(file_path)
 
-    def list_movies(self):
-        """
-        Prints all movies
-        """
-        print(f"{len(self.movies)} movies in total")
+    def save(self, movies: dict[str, Movie]):
+        with open(self.file_path, 'w', newline='') as file:
+            fieldnames = ['title', 'rating', 'year']
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+
+            writer.writeheader()
+            for movie in movies.values():
+                writer.writerow({
+                    'title': movie.title,
+                    'rating': movie.rating,
+                    'year': movie.year_of_release
+                })
+
+    def get_movies(self) -> dict[str, Movie]:
+        movies = {}
+        with open(self.file_path, 'r', newline='') as file:
+            csv_reader = csv.DictReader(file)
+            for row in csv_reader:
+                title = row['title']
+                movie = Movie(
+                    title=title,
+                    year_of_release=int(row['year']),
+                    rating=float(row['rating']),
+                    poster=""
+                )
+                movies[title] = movie
+        return movies
