@@ -9,12 +9,20 @@ class MovieApp:
         self._menu_options_map = {
             "0": ("Exit", self._command_exit_option),
             "1": ("List movies", self._command_list_movies),
-            # "3": ("Delete movie", delete_movie_option),
-            "2": ("Stats", self._command_movie_stats),
-            # "6": ("Random movie", random_movie_option),
-            # "7": ("Search movie", search_movie_option),
-            # "8": ("Movies sorted by rating", sorted_by_rating_option),
+            "2": ("Add movie", self._command_add_movie),
+            "3": ("Delete movie", self._command_delete_movie),
+            "4": ("Stats", self._command_movie_stats),
+            "6": ("Random movie", self._command_random_movie),
+            "7": ("Search movie", self._command_search_movie),
+            "8": ("Movies sorted by rating", self._command_sorted_by_rating),
         }
+
+    def _command_delete_movie(self):
+        """
+        Deletes movie from database
+        """
+        name = input("Enter movie name to delete: ")
+        self._movies_service.delete_movie(name)
 
     def _command_exit_option(self):
         """
@@ -54,6 +62,54 @@ class MovieApp:
         for movie in worst:
             print(f"Worst movie: {movie.title}, {movie.rating}")
 
+    def _command_add_movie(self):
+        """
+        Adds a movie to the DB
+        """
+        while True:
+            title = input("Enter new movie name: ")
+            if title == "" or title.isspace():
+                print("Please enter a valid name")
+            else:
+                break
+
+        self._movies_service.add_movie(title)
+
+    def _command_random_movie(self):
+        """
+        Prints a random movie
+        """
+        movie = self._movies_service.get_random_movie()
+        if movie:
+            print(f"Random Movie: {movie.title} ({movie.year_of_release}), Rating: {movie.rating}")
+        else:
+            print("No movies available.")
+
+    def _command_search_movie(self):
+        """
+        Prints all movies where the title contains the user input
+        """
+        query = input("Enter part of the movie name to search: ")
+        matching_movies = self._movies_service.search_movies(query)
+
+        if not matching_movies:
+            print("No matching movies")
+        else:
+            for movie in matching_movies:
+                print(f"{movie.title}, {movie.rating}")
+
+    def _command_sorted_by_rating(self):
+        """
+        Prints the movies sorted by rating
+        """
+        sorted_movies = self._movies_service.get_movies_sorted_by_rating()
+
+        if sorted_movies:
+            print("Movies sorted by rating (highest to lowest):")
+            for movie in sorted_movies:
+                print(f"{movie.title} ({movie.year_of_release}), Rating: {movie.rating}")
+        else:
+            print("No movies available to sort.")
 
     def _generate_website(self):
         ...
@@ -98,5 +154,4 @@ class MovieApp:
 
                 input("Press enter to continue ")
             finally:
-                pass
-            #     self._movies_service.save_movies()
+                self._movies_service.save_movies()

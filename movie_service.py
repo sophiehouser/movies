@@ -1,7 +1,12 @@
 from movie import Movie
 from istorage import IStorage
 import random
+import requests
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
 
 class MovieService:
     def __init__(self, storage: IStorage):
@@ -22,14 +27,28 @@ class MovieService:
         else:
             return False
 
-    def add_movie(self, title: str, year_of_release: int, rating: float):
-        """
-        Adds a movie using user input
-        :param title: String
-        :param year_of_release: Int
-        :param rating: Float
-        """
-        self.movies[title] = Movie(title, year_of_release, rating, "")
+    def add_movie(self, title: str):
+        url = f"https://www.omdbapi.com/?apikey={API_KEY}&t={title}"
+
+        response = requests.get(url)
+        if response.status_code == 200:
+            movie_data = response.json()
+            if movie_data.get("Response") == "True":
+                new_movie = Movie(
+                    title=movie_data["Title"],
+                    year_of_release=int(movie_data["Year"]),
+                    rating=float(movie_data["imdbRating"]),
+                    poster=movie_data["Poster"]
+                )
+                self.movies[new_movie.title] = new_movie
+                return True
+            else:
+                print(f"Movie '{title}' not found.")
+                return False
+        else:
+            print("Failed to fetch movie data from the API.")
+            return False
+
 
     def delete_movie(self, title: str):
         """
@@ -157,7 +176,7 @@ class MovieService:
         """
         matching_movies = []
         for movie in self.movies.values():
-            if query.lower() in movie.title:
+            if query.lower() in movie.title.lower():
                 matching_movies.append(movie)
 
         return matching_movies
