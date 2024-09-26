@@ -1,5 +1,5 @@
 from movie import Movie
-from istorage import IStorage
+from storage.istorage import IStorage
 import random
 import requests
 from dotenv import load_dotenv

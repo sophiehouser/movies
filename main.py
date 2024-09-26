@@ -1,6 +1,5 @@
 from movie_app import MovieApp
-from storage_json import StorageJson
-from storage_csv import StorageCSV
+from storage.storage_json import StorageJson
 from movie_service import MovieService
 
 if __name__ == '__main__':
